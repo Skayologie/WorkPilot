@@ -327,6 +327,95 @@ function Invoke-Ask {
     $history | ConvertTo-Json | Set-Content $historyFile -Encoding utf8
 }
 
+function Invoke-Config {
+    $envFile = "$PSScriptRoot\.env"
+
+    $fields = @(
+        [PSCustomObject]@{ Key = "TELEGRAM_TOKEN";    Label = "Telegram Token";    Secret = $true  }
+        [PSCustomObject]@{ Key = "TELEGRAM_CHAT_ID";  Label = "Telegram Chat ID";  Secret = $true  }
+        [PSCustomObject]@{ Key = "CLAUDE_EXE";        Label = "Claude CLI Path";   Secret = $false }
+        [PSCustomObject]@{ Key = "TASK_PREFIX";       Label = "Task Prefix";       Secret = $false }
+        [PSCustomObject]@{ Key = "PROJECT_RUN";       Label = "Project Runner";    Secret = $false }
+        [PSCustomObject]@{ Key = "PROJECT_WORKSPACE"; Label = "VS Code Workspace"; Secret = $false }
+        [PSCustomObject]@{ Key = "CHROME_TABS";       Label = "Chrome Tabs";       Secret = $false }
+        [PSCustomObject]@{ Key = "WSL_DISTRO";        Label = "WSL Distro";        Secret = $false }
+        [PSCustomObject]@{ Key = "API_PORT";          Label = "API Port";          Secret = $false }
+        [PSCustomObject]@{ Key = "FRONTEND_PORT";     Label = "Frontend Port";     Secret = $false }
+        [PSCustomObject]@{ Key = "FRONTEND2_PORT";    Label = "Frontend 2 Port";   Secret = $false }
+    )
+
+    while ($true) {
+        # reload values from file on each loop
+        $values = @{}
+        Get-Content $envFile | ForEach-Object {
+            if ($_ -match '^([^#=][^=]*)=(.*)$') {
+                $values[$Matches[1].Trim()] = $Matches[2].Trim()
+            }
+        }
+
+        Clear-Host
+        Write-Host ""
+        Write-Host "  WorkPilot  |  Configuration" -ForegroundColor Cyan
+        Write-Host "  =============================" -ForegroundColor DarkGray
+        Write-Host ""
+
+        for ($i = 0; $i -lt $fields.Count; $i++) {
+            $f   = $fields[$i]
+            $val = $values[$f.Key]
+            $display = if ($f.Secret -and $val)    { "****" }
+                       elseif ($val)                { $val  }
+                       else                         { "(not set)" }
+            $color = if ($val) { "White" } else { "DarkGray" }
+            Write-Host ("  {0,2}.  {1,-22} {2}" -f ($i + 1), $f.Label, $display) -ForegroundColor $color
+        }
+
+        Write-Host ""
+        Write-Host "   0.  Exit" -ForegroundColor DarkGray
+        Write-Host ""
+
+        $choice = (Read-Host "  Pick a number to edit").Trim()
+
+        if ($choice -eq "0" -or $choice -eq "") { break }
+
+        $idx = 0
+        if (-not [int]::TryParse($choice, [ref]$idx) -or $idx -lt 1 -or $idx -gt $fields.Count) {
+            Write-Host "  Invalid choice." -ForegroundColor Red
+            Start-Sleep -Seconds 1
+            continue
+        }
+
+        $field   = $fields[$idx - 1]
+        $current = $values[$field.Key]
+        $displayCurrent = if ($field.Secret -and $current) { "****" } else { $current }
+
+        Write-Host ""
+        Write-Host "  Editing : $($field.Label)" -ForegroundColor Yellow
+        if ($current) { Write-Host "  Current : $displayCurrent" -ForegroundColor DarkGray }
+        $newVal = (Read-Host "  New value (Enter to keep current)").Trim()
+
+        if ($newVal -ne "") {
+            $content = Get-Content $envFile
+            $written = $false
+            $updated = $content | ForEach-Object {
+                if ($_ -match "^$([regex]::Escape($field.Key))=") {
+                    "$($field.Key)=$newVal"
+                    $written = $true
+                } else { $_ }
+            }
+            # if key didn't exist in file yet, append it
+            if (-not $written) { $updated += "$($field.Key)=$newVal" }
+            $updated | Set-Content $envFile -Encoding utf8
+            Write-Host "  Saved!" -ForegroundColor Green
+            Start-Sleep -Seconds 1
+        }
+    }
+
+    Write-Host ""
+    Write-Host "  Done. Restart the bot for changes to take effect:" -ForegroundColor DarkGray
+    Write-Host "  work bot stop   then   work bot start" -ForegroundColor DarkGray
+    Write-Host ""
+}
+
 function Show-Help {
     Write-Host ""
     Write-Host "  WorkPilot" -ForegroundColor Cyan
@@ -342,6 +431,8 @@ function Show-Help {
     Write-Host "  work doctor                 Full health check" -ForegroundColor Cyan
     Write-Host "  work open                   Open Chrome tabs only" -ForegroundColor Cyan
     Write-Host "  work ask <question>         Ask Claude anything" -ForegroundColor Cyan
+    Write-Host "  work config                 Edit your .env settings" -ForegroundColor Cyan
+    Write-Host "  work config show            Print current config" -ForegroundColor Cyan
     Write-Host "  work bot install            Install bot as auto-start task" -ForegroundColor Cyan
     Write-Host "  work bot start / stop       Start or stop the bot" -ForegroundColor Cyan
     Write-Host "  work morning install        Schedule daily 5:30 AM Claude greeting" -ForegroundColor Cyan
@@ -359,6 +450,7 @@ switch ($Cmd) {
     "bot"     { Invoke-Bot }
     "morning" { Invoke-Morning }
     "ask"     { Invoke-Ask }
+    "config"  { Invoke-Config }
     "help"    { Show-Help }
     default   { Show-Help }
 }
