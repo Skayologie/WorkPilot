@@ -3,7 +3,7 @@
 #  Usage: irm https://www.jawadboulmal.com/workpilot/install.ps1 | iex
 # =============================================================
 
-$GITHUB_RAW  = "https://raw.githubusercontent.com/jawadboulmal/workpilot/main"
+$GITHUB_RAW  = "https://raw.githubusercontent.com/Skayologie/WorkPilot/main"
 $INSTALL_DIR = "D:\commands"
 $FILES = @(
     "work.ps1",
