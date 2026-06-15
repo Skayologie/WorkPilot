@@ -13,6 +13,14 @@ $WORK        = "$PSScriptRoot\work.ps1"
 $TASK_PREFIX = if ($env:TASK_PREFIX) { $env:TASK_PREFIX } else { "MyWorkBot" }
 $HIST_FILE   = "$PSScriptRoot\claude-chat-history.json"
 
+# ---- kill previous bot instances ------------------------
+$myPid = $PID
+Get-WmiObject Win32_Process -Filter "Name='powershell.exe'" | Where-Object {
+    $_.CommandLine -like "*work-bot.ps1*" -and $_.ProcessId -ne $myPid
+} | ForEach-Object {
+    Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue
+}
+
 # ---- first-run check ------------------------------------
 if (-not $TOKEN -or $TOKEN -eq "YOUR_BOT_TOKEN_HERE") {
     Write-Host ""
