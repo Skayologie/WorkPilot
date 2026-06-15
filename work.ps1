@@ -470,24 +470,24 @@ function Invoke-Update {
 function Show-Help {
     Write-Host ""
     Write-Host "  WorkPilot" -ForegroundColor Cyan
-    Write-Host "  Usage: work <command> [arg]" -ForegroundColor White
+    Write-Host "  Usage: pilot <command> [arg]" -ForegroundColor White
     Write-Host ""
     Write-Host "  =============================" -ForegroundColor DarkGray
-    Write-Host "  work begin                  Start apps + project services" -ForegroundColor Cyan
-    Write-Host "  work done                   Stop apps + project services" -ForegroundColor Cyan
-    Write-Host "  work status                 Show what is running" -ForegroundColor Cyan
-    Write-Host "  work restart                Restart all project services" -ForegroundColor Cyan
-    Write-Host "  work restart <service>      Restart one service" -ForegroundColor Cyan
-    Write-Host "  work logs <service>         Tail service logs" -ForegroundColor Cyan
-    Write-Host "  work doctor                 Full health check" -ForegroundColor Cyan
-    Write-Host "  work open                   Open Chrome tabs only" -ForegroundColor Cyan
-    Write-Host "  work ask <question>         Ask Claude anything" -ForegroundColor Cyan
-    Write-Host "  work config                 Edit your .env settings" -ForegroundColor Cyan
-    Write-Host "  work config show            Print current config" -ForegroundColor Cyan
-    Write-Host "  work bot install            Install bot as auto-start task" -ForegroundColor Cyan
-    Write-Host "  work bot start / stop       Start or stop the bot" -ForegroundColor Cyan
-    Write-Host "  work morning install        Schedule daily 5:30 AM Claude greeting" -ForegroundColor Cyan
-    Write-Host "  work update                 Check and install WorkPilot updates" -ForegroundColor Cyan
+    Write-Host "  pilot begin                  Start apps + project services" -ForegroundColor Cyan
+    Write-Host "  pilot done                   Stop apps + project services" -ForegroundColor Cyan
+    Write-Host "  pilot status                 Show what is running" -ForegroundColor Cyan
+    Write-Host "  pilot restart                Restart all project services" -ForegroundColor Cyan
+    Write-Host "  pilot restart <service>      Restart one service" -ForegroundColor Cyan
+    Write-Host "  pilot logs <service>         Tail service logs" -ForegroundColor Cyan
+    Write-Host "  pilot doctor                 Full health check" -ForegroundColor Cyan
+    Write-Host "  pilot open                   Open Chrome tabs only" -ForegroundColor Cyan
+    Write-Host "  pilot ask <question>         Ask Claude anything" -ForegroundColor Cyan
+    Write-Host "  pilot config                 Edit your .env settings" -ForegroundColor Cyan
+    Write-Host "  pilot config show            Print current config" -ForegroundColor Cyan
+    Write-Host "  pilot bot install            Install bot as auto-start task" -ForegroundColor Cyan
+    Write-Host "  pilot bot start / stop       Start or stop the bot" -ForegroundColor Cyan
+    Write-Host "  pilot morning install        Schedule daily 5:30 AM Claude greeting" -ForegroundColor Cyan
+    Write-Host "  pilot update                 Check and install WorkPilot updates" -ForegroundColor Cyan
     Write-Host ""
 }
 
