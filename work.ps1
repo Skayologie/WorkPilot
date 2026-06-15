@@ -446,7 +446,7 @@ function Invoke-Update {
     Log "Update" "New version available: $remoteVersion  (current: $localVersion)" "Yellow"
     Log "Update" "Downloading update..." "Yellow"
 
-    $updateFiles = @("work.ps1","work-bot.ps1","work-bot-launcher.vbs","work.bat","config.ps1",".gitignore","VERSION")
+    $updateFiles = @("work.ps1","work-bot.ps1","work-bot-launcher.vbs","pilot.ps1","config.ps1",".gitignore","VERSION")
     $failed = 0
     foreach ($f in $updateFiles) {
         try {
