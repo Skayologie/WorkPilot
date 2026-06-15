@@ -68,7 +68,8 @@ Send "WorkPilot online. Send /help for all commands."
 try {
     $GITHUB_RAW   = "https://raw.githubusercontent.com/Skayologie/WorkPilot/main"
     $localVer     = if (Test-Path "$PSScriptRoot\VERSION") { (Get-Content "$PSScriptRoot\VERSION" -Raw).Trim() } else { "0.0.0" }
-    $remoteVer    = (Invoke-WebRequest -Uri "$GITHUB_RAW/VERSION" -UseBasicParsing -TimeoutSec 5).Content.Trim()
+    $bust         = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
+    $remoteVer    = (Invoke-WebRequest -Uri "$GITHUB_RAW/VERSION?t=$bust" -UseBasicParsing -TimeoutSec 5).Content.Trim()
     if ($localVer -ne $remoteVer) {
         Send "Update available: $localVer -> $remoteVer. Send /update to install."
     }

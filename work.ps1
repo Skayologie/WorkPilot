@@ -423,6 +423,70 @@ function Invoke-Config {
     Write-Host ""
 }
 
+function Invoke-Uninstall {
+    Write-Host ""
+    Write-Host "  WorkPilot Uninstaller" -ForegroundColor Cyan
+    Write-Host "  =====================" -ForegroundColor DarkGray
+    Write-Host ""
+
+    # 1. stop the bot
+    Log "Uninstall" "Stopping bot..." "Yellow"
+    Get-WmiObject Win32_Process -Filter "Name='powershell.exe'" | Where-Object {
+        $_.CommandLine -like "*work-bot.ps1*"
+    } | ForEach-Object {
+        Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue
+    }
+    Log "Uninstall" "Bot stopped." "Green"
+
+    # 2. remove all scheduled tasks
+    Log "Uninstall" "Removing scheduled tasks..." "Yellow"
+    $tasks = @(Get-ScheduledTask -ErrorAction SilentlyContinue | Where-Object { $_.TaskName -like "${TASK_PREFIX}*" })
+    if ($tasks.Count -eq 0) {
+        Log "Uninstall" "No tasks found." "DarkGray"
+    } else {
+        foreach ($task in $tasks) {
+            Unregister-ScheduledTask -TaskName $task.TaskName -Confirm:$false -ErrorAction SilentlyContinue
+            Log "Uninstall" "  Removed task: $($task.TaskName)" "Green"
+        }
+    }
+
+    # 3. remove install dir from user PATH
+    Log "Uninstall" "Removing from PATH..." "Yellow"
+    $userPath = [System.Environment]::GetEnvironmentVariable("PATH", "User")
+    $newPath  = ($userPath -split ';' | Where-Object { $_.TrimEnd('\') -ne $PSScriptRoot.TrimEnd('\') }) -join ';'
+    [System.Environment]::SetEnvironmentVariable("PATH", $newPath, "User")
+    Log "Uninstall" "Removed from PATH." "Green"
+
+    # 4. optionally delete files
+    Write-Host ""
+    $confirm = (Read-Host "  Delete all WorkPilot files from $PSScriptRoot ? (y/N)").Trim().ToLower()
+    if ($confirm -eq "y") {
+        $toDelete = @(
+            "work-bot.ps1","work-bot-launcher.vbs","pilot.ps1",
+            "config.ps1",".gitignore","VERSION","README.md",
+            ".env.example","claude-chat-history.json"
+        )
+        foreach ($f in $toDelete) {
+            $p = "$PSScriptRoot\$f"
+            if (Test-Path $p) {
+                Remove-Item $p -Force -ErrorAction SilentlyContinue
+                Log "Uninstall" "  Deleted: $f" "DarkGray"
+            }
+        }
+        Write-Host ""
+        Write-Host "  Done. Manually delete these last files to finish:" -ForegroundColor Yellow
+        Write-Host "    $PSScriptRoot\.env      (kept to protect your credentials)" -ForegroundColor DarkGray
+        Write-Host "    $PSScriptRoot\work.ps1  (can't delete a running script)" -ForegroundColor DarkGray
+        Write-Host ""
+        Write-Host "  Then remove the folder: $PSScriptRoot" -ForegroundColor DarkGray
+    } else {
+        Write-Host ""
+        Write-Host "  Tasks removed and PATH cleaned. Files kept." -ForegroundColor Green
+        Write-Host "  Delete $PSScriptRoot manually whenever you want." -ForegroundColor DarkGray
+    }
+    Write-Host ""
+}
+
 function Invoke-Update {
     $GITHUB_RAW   = "https://raw.githubusercontent.com/Skayologie/WorkPilot/main"
     $versionFile  = "$PSScriptRoot\VERSION"
@@ -432,7 +496,8 @@ function Invoke-Update {
     Log "Update" "Checking for updates..." "Yellow"
 
     try {
-        $remoteVersion = (Invoke-WebRequest -Uri "$GITHUB_RAW/VERSION" -UseBasicParsing -TimeoutSec 10).Content.Trim()
+        $bust          = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
+        $remoteVersion = (Invoke-WebRequest -Uri "$GITHUB_RAW/VERSION?t=$bust" -UseBasicParsing -TimeoutSec 10).Content.Trim()
     } catch {
         Log "Update" "Could not reach GitHub. Check your connection." "Red"
         return
@@ -488,6 +553,7 @@ function Show-Help {
     Write-Host "  pilot bot start / stop       Start or stop the bot" -ForegroundColor Cyan
     Write-Host "  pilot morning install        Schedule daily 5:30 AM Claude greeting" -ForegroundColor Cyan
     Write-Host "  pilot update                 Check and install WorkPilot updates" -ForegroundColor Cyan
+    Write-Host "  pilot uninstall              Remove WorkPilot from this machine" -ForegroundColor Cyan
     Write-Host ""
 }
 
@@ -503,7 +569,8 @@ switch ($Cmd) {
     "morning" { Invoke-Morning }
     "ask"     { Invoke-Ask }
     "config"  { Invoke-Config }
-    "update"  { Invoke-Update }
-    "help"    { Show-Help }
+    "update"    { Invoke-Update }
+    "uninstall" { Invoke-Uninstall }
+    "help"      { Show-Help }
     default   { Show-Help }
 }
