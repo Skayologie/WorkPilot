@@ -55,6 +55,17 @@ try {
 } catch {}
 
 Send "WorkPilot online. Send /help for all commands."
+
+# ---- startup update check -----------------------------------
+try {
+    $GITHUB_RAW   = "https://raw.githubusercontent.com/Skayologie/WorkPilot/main"
+    $localVer     = if (Test-Path "$PSScriptRoot\VERSION") { (Get-Content "$PSScriptRoot\VERSION" -Raw).Trim() } else { "0.0.0" }
+    $remoteVer    = (Invoke-WebRequest -Uri "$GITHUB_RAW/VERSION" -UseBasicParsing -TimeoutSec 5).Content.Trim()
+    if ($localVer -ne $remoteVer) {
+        Send "Update available: $localVer -> $remoteVer. Send /update to install."
+    }
+} catch {}
+
 $jobs = [System.Collections.Generic.List[object]]::new()
 
 # ---- main loop ------------------------------------------
@@ -198,6 +209,11 @@ while ($true) {
                     }
                 }
 
+                "^/update" {
+                    Send "Checking for updates..."
+                    $jobs.Add((RunAsync "update"))
+                }
+
                 "^/help" {
                     Send @"
 Available commands:
@@ -219,6 +235,9 @@ Schedules:
 /schedule 08:30 <message>   Add daily schedule
 /unschedule 08:30           Remove a schedule
 /schedules                  List all schedules
+
+System:
+/update              Check and install updates
 "@
                 }
 

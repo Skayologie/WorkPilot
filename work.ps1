@@ -423,6 +423,50 @@ function Invoke-Config {
     Write-Host ""
 }
 
+function Invoke-Update {
+    $GITHUB_RAW   = "https://raw.githubusercontent.com/Skayologie/WorkPilot/main"
+    $versionFile  = "$PSScriptRoot\VERSION"
+    $localVersion = if (Test-Path $versionFile) { (Get-Content $versionFile -Raw).Trim() } else { "0.0.0" }
+
+    Log "Update" "Current version : $localVersion" "Cyan"
+    Log "Update" "Checking for updates..." "Yellow"
+
+    try {
+        $remoteVersion = (Invoke-WebRequest -Uri "$GITHUB_RAW/VERSION" -UseBasicParsing -TimeoutSec 10).Content.Trim()
+    } catch {
+        Log "Update" "Could not reach GitHub. Check your connection." "Red"
+        return
+    }
+
+    if ($localVersion -eq $remoteVersion) {
+        Log "Update" "Already up to date ($localVersion)." "Green"
+        return
+    }
+
+    Log "Update" "New version available: $remoteVersion  (current: $localVersion)" "Yellow"
+    Log "Update" "Downloading update..." "Yellow"
+
+    $updateFiles = @("work.ps1","work-bot.ps1","work-bot-launcher.vbs","work.bat","config.ps1",".gitignore","VERSION")
+    $failed = 0
+    foreach ($f in $updateFiles) {
+        try {
+            Invoke-WebRequest -Uri "$GITHUB_RAW/$f" -OutFile "$PSScriptRoot\$f" -UseBasicParsing -ErrorAction Stop
+            Log "Update" "  OK  $f" "Green"
+        } catch {
+            Log "Update" "  FAIL  $f" "Red"
+            $failed++
+        }
+    }
+
+    if ($failed -eq 0) {
+        Log "Update" "WorkPilot updated to $remoteVersion!" "Green"
+        Log "Update" "Restart the bot for changes to take effect." "DarkGray"
+        Send-Telegram "WorkPilot updated: $localVersion -> $remoteVersion. Restart the bot to apply changes."
+    } else {
+        Log "Update" "$failed file(s) failed. Update may be partial." "Red"
+    }
+}
+
 function Show-Help {
     Write-Host ""
     Write-Host "  WorkPilot" -ForegroundColor Cyan
@@ -443,6 +487,7 @@ function Show-Help {
     Write-Host "  work bot install            Install bot as auto-start task" -ForegroundColor Cyan
     Write-Host "  work bot start / stop       Start or stop the bot" -ForegroundColor Cyan
     Write-Host "  work morning install        Schedule daily 5:30 AM Claude greeting" -ForegroundColor Cyan
+    Write-Host "  work update                 Check and install WorkPilot updates" -ForegroundColor Cyan
     Write-Host ""
 }
 
@@ -458,6 +503,7 @@ switch ($Cmd) {
     "morning" { Invoke-Morning }
     "ask"     { Invoke-Ask }
     "config"  { Invoke-Config }
+    "update"  { Invoke-Update }
     "help"    { Show-Help }
     default   { Show-Help }
 }

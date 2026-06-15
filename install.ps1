@@ -16,7 +16,8 @@ $FILES = @(
     "work.bat",
     "config.ps1",
     ".env.example",
-    ".gitignore"
+    ".gitignore",
+    "VERSION"
 )
 
 Clear-Host
