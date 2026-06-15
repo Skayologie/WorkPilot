@@ -1,3 +1,10 @@
+# ==============================================================
+#  WorkPilot - work.ps1
+#  Author  : Jawad Boulmal
+#  GitHub  : https://github.com/Skayologie
+#  Project : https://github.com/Skayologie/WorkPilot
+# ==============================================================
+
 param(
     [Parameter(Position=0)] [string]$Cmd = "help",
     [Parameter(Position=1)] [string]$Arg = ""

@@ -1,5 +1,10 @@
 # ==============================================================
-#  config.ps1  —  Loads .env and sets process environment vars.
+#  WorkPilot - config.ps1
+#  Author  : Jawad Boulmal
+#  GitHub  : https://github.com/Skayologie
+#  Project : https://github.com/Skayologie/WorkPilot
+# --------------------------------------------------------------
+#  Loads .env and sets process environment vars.
 #  Dot-source this at the top of every script:  . "$PSScriptRoot\config.ps1"
 # ==============================================================
 

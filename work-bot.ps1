@@ -1,6 +1,9 @@
-# =========================================================
-#  WorkPilot  —  Telegram bot
-# =========================================================
+# ==============================================================
+#  WorkPilot - work-bot.ps1
+#  Author  : Jawad Boulmal
+#  GitHub  : https://github.com/Skayologie
+#  Project : https://github.com/Skayologie/WorkPilot
+# ==============================================================
 
 . "$PSScriptRoot\config.ps1"
 

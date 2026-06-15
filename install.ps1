@@ -1,10 +1,14 @@
-# =============================================================
-#  WorkPilot Installer
+# ==============================================================
+#  WorkPilot - install.ps1
+#  Author  : Jawad Boulmal
+#  GitHub  : https://github.com/Skayologie
+#  Project : https://github.com/Skayologie/WorkPilot
+# --------------------------------------------------------------
 #  Usage: irm https://www.jawadboulmal.com/workpilot/install.ps1 | iex
-# =============================================================
+# ==============================================================
 
 $GITHUB_RAW  = "https://raw.githubusercontent.com/Skayologie/WorkPilot/main"
-$INSTALL_DIR = "D:\commands"
+$INSTALL_DIR = "C:\workpilot"
 $FILES = @(
     "work.ps1",
     "work-bot.ps1",
@@ -128,7 +132,7 @@ FRONTEND2_PORT=
     Write-Host "  .env created." -ForegroundColor Green
 }
 
-# --- add D:\commands to user PATH
+# --- add install dir to user PATH
 $userPath = [System.Environment]::GetEnvironmentVariable("PATH", "User")
 if ($userPath -notlike "*$INSTALL_DIR*") {
     [System.Environment]::SetEnvironmentVariable("PATH", "$userPath;$INSTALL_DIR", "User")
