@@ -13,7 +13,7 @@ $FILES = @(
     "work.ps1",
     "work-bot.ps1",
     "work-bot-launcher.vbs",
-    "work.bat",
+    "pilot.bat",
     "config.ps1",
     ".env.example",
     ".gitignore",
@@ -155,10 +155,10 @@ Write-Host "  =================================" -ForegroundColor Green
 Write-Host ""
 Write-Host "  Open a NEW terminal and type:" -ForegroundColor White
 Write-Host ""
-Write-Host "    work begin       start your work environment" -ForegroundColor Cyan
-Write-Host "    work done        stop everything" -ForegroundColor Cyan
-Write-Host "    work status      see what is running" -ForegroundColor Cyan
-Write-Host "    work help        all commands" -ForegroundColor Cyan
+Write-Host "    pilot begin       start your work environment" -ForegroundColor Cyan
+Write-Host "    pilot done        stop everything" -ForegroundColor Cyan
+Write-Host "    pilot status      see what is running" -ForegroundColor Cyan
+Write-Host "    pilot help        all commands" -ForegroundColor Cyan
 Write-Host ""
 Write-Host "  Your Telegram bot is live. Send /help to it now." -ForegroundColor White
 Write-Host ""
