@@ -13,7 +13,7 @@ $FILES = @(
     "work.ps1",
     "work-bot.ps1",
     "work-bot-launcher.vbs",
-    "pilot.bat",
+    "pilot.ps1",
     "config.ps1",
     ".env.example",
     ".gitignore",
